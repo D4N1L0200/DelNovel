@@ -1,5 +1,5 @@
 import pygame as pg
-from .widgets import Widget
+from .ui.widgets import Widget
 
 
 class Scene:

@@ -1,4 +1,5 @@
-from novelib.ui import SceneManager, widgets, Anchor, Sizing, Link
+from novelib import SceneManager
+from novelib.ui import widgets, Anchor, Sizing, Link
 
 SceneManager.createScene("main_menu")
 SceneManager.insertWidget(

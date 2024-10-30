@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from .scene_manager import SceneManager
+from ..scene_manager import SceneManager
 from .widgets import Modal
 
 

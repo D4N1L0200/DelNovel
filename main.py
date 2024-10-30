@@ -1,5 +1,5 @@
 import pygame as pg
-from novelib.ui import SceneManager
+from novelib import SceneManager
 from scenes import main_menu
 
 
