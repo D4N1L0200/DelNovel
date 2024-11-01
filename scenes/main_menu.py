@@ -1,3 +1,4 @@
+from typing import Optional
 from novelib import SceneManager
 from novelib.ui import widgets, Anchor, Sizing, Order, Link
 
@@ -17,7 +18,7 @@ menu_items: widgets.Block = widgets.Block(
 
 menu_items.addWidget(
     widgets.Button(
-        Anchor.TOP,
+        Anchor.NONE,
         Sizing.COVER,
         "Start Game",
         Link.toScene("game_start"),
@@ -25,7 +26,7 @@ menu_items.addWidget(
 )
 menu_items.addWidget(
     widgets.Button(
-        Anchor.BOTTOM,
+        Anchor.NONE,
         Sizing.COVER,
         "Settings",
         Link.toScene("main_menu_settings"),
@@ -34,16 +35,35 @@ menu_items.addWidget(
 
 SceneManager.insertWidget("main_menu", menu_items)
 
-# about_modal: widgets.Modal = widgets.Modal(Anchor.CENTER, Sizing.COVER, "About Page")
-# about_modal.addWidget(
-#     widgets.TextArea(Anchor.CENTER, Sizing.FILL, "This is an about page.")
-# )
+about_modal: widgets.Modal = widgets.Modal(Anchor.CENTER, Sizing.COVER, "About Page")
+about_modal.addWidget(
+    widgets.TextArea(Anchor.CENTER, Sizing.COVER, "This is an about page.")
+)
+about_modal.addWidget(
+    widgets.TextArea(
+        Anchor.CENTER, Sizing.COVER, "This is another line of the about page."
+    )
+)
+about_modal.addWidget(
+    widgets.TextArea(Anchor.CENTER, Sizing.COVER, "This is a\nmultiline\nparagraph.")
+)
 
-# menu_about = widgets.Button(
-#     Anchor.BOTTOMLEFT,
-#     Sizing.COVER,
-#     "About",
-#     Link.toModal(about_modal),
-# )
 
-# SceneManager.insertWidget("main_menu", menu_about)
+modal_idx: int = SceneManager.insertWidgetIdx("main_menu", about_modal)
+
+button_about = widgets.Button(
+    Anchor.NONE,
+    Sizing.COVER,
+    "About",
+    Link.toModal(modal_idx),
+)
+
+about_block: widgets.Block = widgets.Block(
+    Anchor.TOPRIGHT,
+    Sizing.COVER,
+    Order.HORIZONTAL,
+)
+
+about_block.addWidget(button_about)
+
+SceneManager.insertWidget("main_menu", about_block)

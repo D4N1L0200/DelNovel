@@ -20,7 +20,7 @@ def loop(window: pg.Surface, clock: pg.time.Clock) -> None:
 
 def main() -> None:
     pg.init()
-    window: pg.Surface = pg.display.set_mode((800, 600))
+    window: pg.Surface = pg.display.set_mode((800, 600), pg.RESIZABLE)
     pg.display.set_caption("Window")
 
     clock: pg.time.Clock = pg.time.Clock()

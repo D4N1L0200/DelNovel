@@ -16,6 +16,7 @@ class Widget(ABC):
         self.sizing: Sizing = sizing
         self.order: Order = order
         self.widgets: list[Widget] = []
+        self.rect: Optional[pg.Rect] = None
 
     def addWidget(self, widget: T) -> None:
         self.widgets.append(widget)
@@ -54,13 +55,25 @@ class Widget(ABC):
         self, window: pg.Surface, pos: tuple[int, int], size: tuple[int, int]
     ) -> None: ...
 
+    def handleEvent(self, event: pg.event.Event) -> None:
+        for widget in self.widgets:
+            widget.handleEvent(event)
+
 
 class ClickableWidget(Widget):
     def __init__(self, anchor: Anchor, sizing: Sizing) -> None:
         super().__init__(anchor, sizing)
 
+    def handleEvent(self, event: pg.event.Event) -> None:
+        if event.type == pg.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                if not self.rect:
+                    return
+                if self.rect.collidepoint(event.pos):
+                    self.onClick(event.pos, event.button)
+
     @abstractmethod
-    def onClick(self) -> None: ...
+    def onClick(self, pos: tuple[int, int], mouse_button: int) -> None: ...
 
 
 class WritableWidget(Widget):
@@ -107,23 +120,40 @@ class Button(WritableWidget, ClickableWidget):
         sizing: Sizing,
         text: str,
         action,
-        font: Optional[pg.font.Font] = None,
-    ):
+    ) -> None:
         # def __init__(self, anchor: Anchor, sizing: Sizing, text: str, font: pg.font.Font, action: Action):
-        super().__init__(anchor, sizing, text=text)
+        super().__init__(anchor, sizing, text)
         self.action = action
         # self.action: Action = action
-        if font:
-            self.font: pg.font.Font = font
 
-    def onClick(self):
+    def onClick(self, pos: tuple[int, int], mouse_button: int) -> None:
         self.action.execute()
 
     def draw(
         self, window: pg.Surface, pos: tuple[int, int], size: tuple[int, int]
     ) -> None:
-        pg.draw.rect(window, (255, 255, 255), (*pos, *size))
+        if not self.font:
+            return
+
+        self.rect = pg.Rect(pos, size)
+        pg.draw.rect(window, (255, 255, 255), self.rect)
         text: pg.Surface = self.font.render(self.text, False, (255, 0, 0))
+        window.blit(text, pos)
+
+
+class TextArea(WritableWidget):
+    def __init__(self, anchor: Anchor, sizing: Sizing, text: str):
+        super().__init__(anchor, sizing, text)
+
+    def draw(
+        self, window: pg.Surface, pos: tuple[int, int], size: tuple[int, int]
+    ) -> None:
+        if not self.font:
+            return
+
+        self.rect = pg.Rect(pos, size)
+        pg.draw.rect(window, (255, 255, 255), self.rect)
+        text: pg.Surface = self.font.render(self.text, False, (0, 0, 255))
         window.blit(text, pos)
 
 
@@ -133,24 +163,31 @@ class Modal(Widget):
         self.title: str = title
         self.is_visible: bool = False
 
-    def show(self):
-        self.is_visible = True
+    def toggle(self):
+        self.is_visible = not self.is_visible
 
     def draw(
         self, window: pg.Surface, pos: tuple[int, int], size: tuple[int, int]
     ) -> None:
-        pass
+        if not self.is_visible:
+            return
 
+        offsets, size = self.calcSize(size)
 
-class TextArea(Widget):
-    def __init__(self, anchor: Anchor, sizing: Sizing, text: str):
-        super().__init__(anchor, sizing)
-        self.text: str = text
+        match self.anchor:
+            case Anchor.CENTER:
+                pos = (
+                    (window.get_width() // 2) - (size[0] // 2),
+                    (window.get_height() // 2) - (size[1] // 2),
+                )
+            case _:
+                raise NotImplementedError
 
-    def draw(
-        self, window: pg.Surface, pos: tuple[int, int], size: tuple[int, int]
-    ) -> None:
-        pass
+        pg.draw.rect(window, (255, 255, 255), (*pos, *size), 1)
+
+        for idx, widget in enumerate(self.widgets):
+            pos = (pos[0] + offsets[idx][0], pos[1] + offsets[idx][1])
+            widget.draw(window, pos, size)
 
 
 class Block(Widget):
@@ -168,8 +205,16 @@ class Block(Widget):
                     (window.get_width() // 2) - (size[0] // 2),
                     (window.get_height() // 2) - (size[1] // 2),
                 )
+            case Anchor.TOPLEFT:
+                pos = (0, 0)
+            case Anchor.TOPRIGHT:
+                pos = (window.get_width() - size[0], 0)
+            case Anchor.BOTTOMLEFT:
+                pos = (0, window.get_height() - size[1])
+            case Anchor.BOTTOMRIGHT:
+                pos = (window.get_width() - size[0], window.get_height() - size[1])
             case _:
-                pass  # TODO: raise
+                raise NotImplementedError
 
         pg.draw.rect(window, (255, 255, 255), (*pos, *size), 1)
 

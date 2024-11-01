@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from ..scene_manager import SceneManager
-from .widgets import Modal
+from .widgets import Widget, Modal
 
 
 class Action(ABC):
@@ -17,11 +17,16 @@ class SceneAction(Action):
 
 
 class ModalAction(Action):
-    def __init__(self, modal: Modal) -> None:
-        self.modal: Modal = modal
+    def __init__(self, modal_idx: int) -> None:
+        self.modal_idx: int = modal_idx
 
     def execute(self) -> None:
-        self.modal.show()
+        modal: Widget = SceneManager.active_scene.widgets[self.modal_idx]
+
+        if isinstance(modal, Modal):
+            modal.toggle()
+        else:
+            raise TypeError("Modal must be a Modal Widget")
 
 
 class Link:
@@ -30,5 +35,5 @@ class Link:
         return SceneAction(scene_name)
 
     @staticmethod
-    def toModal(modal: Modal) -> ModalAction:
-        return ModalAction(modal)
+    def toModal(modal_idx: int) -> ModalAction:
+        return ModalAction(modal_idx)

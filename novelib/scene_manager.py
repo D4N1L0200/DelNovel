@@ -1,13 +1,16 @@
 import pygame as pg
-from .ui.widgets import Widget, WritableWidget
+from typing import Optional
+from .ui.widgets import Widget, WritableWidget, ClickableWidget
 
 
 class Scene:
     def __init__(self) -> None:
         self.widgets: list[Widget] = []
 
-    def addWidget(self, widget: Widget) -> None:
+    def addWidget(self, widget: Widget) -> int:
         self.widgets.append(widget)
+
+        return len(self.widgets) - 1
 
 
 class SceneManager:
@@ -33,7 +36,7 @@ class SceneManager:
     @classmethod
     def createScene(cls, scene_name: str) -> None:
         if scene_name in cls.scenes:
-            return  # TODO: raise
+            raise ValueError(f"Scene {scene_name} already exists")
 
         scene: Scene = Scene()
         cls.scenes[scene_name] = scene
@@ -41,20 +44,28 @@ class SceneManager:
     @classmethod
     def insertWidget(cls, scene_name: str, widget: Widget) -> None:
         if scene_name not in cls.scenes:
-            return  # TODO: raise
+            raise ValueError(f"Scene {scene_name} not found")
 
         cls.scenes[scene_name].addWidget(widget)
 
     @classmethod
+    def insertWidgetIdx(cls, scene_name: str, widget: Widget) -> int:
+        if scene_name not in cls.scenes:
+            raise ValueError(f"Scene {scene_name} not found")
+
+        return cls.scenes[scene_name].addWidget(widget)
+
+    @classmethod
     def loadScene(cls, scene_name: str) -> None:
         if scene_name not in cls.scenes:
-            return  # TODO: raise
+            raise ValueError(f"Scene {scene_name} not found")
 
         cls.active_scene = cls.scenes[scene_name]
 
     @classmethod
     def handleEvent(cls, event: pg.event.Event) -> None:
-        pass
+        for widget in cls.active_scene.widgets:
+            widget.handleEvent(event)
 
     @classmethod
     def drawScene(cls, window: pg.Surface) -> None:

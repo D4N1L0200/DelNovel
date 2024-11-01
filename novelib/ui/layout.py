@@ -2,17 +2,18 @@ from enum import Enum
 
 
 class Anchor(Enum):
-    CENTER = 1
-
-    TOP = 2
-    BOTTOM = 3
-    LEFT = 4
-    RIGHT = 5
-
-    TOPLEFT = 6
-    TOPRIGHT = 7
-    BOTTOMLEFT = 8
-    BOTTOMRIGHT = 9
+    NONE = 1
+    CENTER = 2
+    
+    TOP = 3
+    BOTTOM = 4
+    LEFT = 5
+    RIGHT = 6
+    
+    TOPLEFT = 7
+    TOPRIGHT = 8
+    BOTTOMLEFT = 9
+    BOTTOMRIGHT = 10
 
 
 class Sizing(Enum):
