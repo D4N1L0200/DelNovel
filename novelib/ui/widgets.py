@@ -36,12 +36,12 @@ class Widget(ABC):
                         for widget in self.widgets:
                             _, widg_size = widget.calcSize(size)
                             offsets.append((0, size[1]))
-                            size = (max(size[0], widg_size[0]), size[1] + widg_size[1])
+                            size = (max(size[0], widg_size[0]), widg_size[1])
                     case Order.HORIZONTAL:
                         for widget in self.widgets:
                             _, widg_size = widget.calcSize(size)
                             offsets.append((size[0], 0))
-                            size = (size[0] + widg_size[0], max(size[1], widg_size[1]))
+                            size = (widg_size[0], max(size[1], widg_size[1]))
                     case _:
                         pass  # TODO: raise
             case _:

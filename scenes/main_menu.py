@@ -1,7 +1,6 @@
 from novelib import SceneManager
 from novelib.ui import widgets, Anchor, Sizing, Order, Link
 
-SceneManager.createFont("Minecraftia", "Minecraftia-Regular.ttf", 24)
 SceneManager.createFont("PressStart", "PressStart2P.ttf", 24)
 
 SceneManager.createScene("main_menu")
@@ -30,7 +29,6 @@ menu_items.addWidget(
         Sizing.COVER,
         "Settings",
         Link.toScene("main_menu_settings"),
-        font=SceneManager.getFont("PressStart"),
     )
 )
 
