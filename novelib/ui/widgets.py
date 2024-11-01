@@ -3,6 +3,7 @@ from .layout import Anchor, Sizing, Order
 
 # from .interactions import Action # TODO: Fix circular import
 from typing import TypeVar, Optional
+from ..themes import THEME
 import pygame as pg
 
 T = TypeVar("T", bound="Widget")
@@ -60,6 +61,18 @@ class Widget(ABC):
             widget.handleEvent(event)
 
 
+class Background(Widget):
+    def __init__(self, anchor: Anchor, sizing: Sizing, image_name: str) -> None:
+        super().__init__(anchor, sizing)
+        self.image_name: str = image_name
+
+    def draw(
+        self, window: pg.Surface, pos: tuple[int, int], size: tuple[int, int]
+    ) -> None:
+        pass
+        # window.blit(pg.image.load(self.image_name), (0, 0))
+
+
 class ClickableWidget(Widget):
     def __init__(self, anchor: Anchor, sizing: Sizing) -> None:
         super().__init__(anchor, sizing)
@@ -79,9 +92,11 @@ class ClickableWidget(Widget):
 class WritableWidget(Widget):
     font: Optional[pg.font.Font] = None
 
-    def __init__(self, anchor: Anchor, sizing: Sizing, text: str) -> None:
+    def __init__(self, anchor: Anchor, sizing: Sizing, text: list[str]) -> None:
         super().__init__(anchor, sizing)
-        self.text: str = text
+        self.text: list[str] = []
+        for line in text:
+            self.text.extend(line.split("\n"))
         self.font: pg.font.Font = WritableWidget.font
 
     def calcSize(
@@ -93,24 +108,25 @@ class WritableWidget(Widget):
             case Sizing.FILL:
                 pass
             case Sizing.COVER:
-                text: pg.Surface = self.font.render(self.text, False, (0, 0, 0))
-                size = (text.get_width(), text.get_height())
+                for line in self.text:
+                    text: pg.Surface = self.font.render(line, False, (0, 0, 0))
+                    size = (max(size[0], text.get_width()), size[1] + text.get_height())
             case _:
                 pass  # TODO: raise
 
         return [], size
 
-
-class Background(Widget):
-    def __init__(self, anchor: Anchor, sizing: Sizing, image_name: str) -> None:
-        super().__init__(anchor, sizing)
-        self.image_name: str = image_name
-
     def draw(
         self, window: pg.Surface, pos: tuple[int, int], size: tuple[int, int]
     ) -> None:
-        pass
-        # window.blit(pg.image.load(self.image_name), (0, 0))
+        if not self.font:
+            return
+
+        self.rect = pg.Rect(pos, size)
+        pg.draw.rect(window, THEME.BG_COLOR, self.rect)
+        for idx, line in enumerate(self.text):
+            text: pg.Surface = self.font.render(line, False, THEME.TEXT_COLOR)
+            window.blit(text, (pos[0], pos[1] + idx * text.get_height()))
 
 
 class Button(WritableWidget, ClickableWidget):
@@ -122,48 +138,26 @@ class Button(WritableWidget, ClickableWidget):
         action,
     ) -> None:
         # def __init__(self, anchor: Anchor, sizing: Sizing, text: str, font: pg.font.Font, action: Action):
-        super().__init__(anchor, sizing, text)
+        super().__init__(anchor, sizing, [text])
         self.action = action
         # self.action: Action = action
 
     def onClick(self, pos: tuple[int, int], mouse_button: int) -> None:
         self.action.execute()
 
-    def draw(
-        self, window: pg.Surface, pos: tuple[int, int], size: tuple[int, int]
-    ) -> None:
-        if not self.font:
-            return
-
-        self.rect = pg.Rect(pos, size)
-        pg.draw.rect(window, (255, 255, 255), self.rect)
-        text: pg.Surface = self.font.render(self.text, False, (255, 0, 0))
-        window.blit(text, pos)
-
 
 class TextArea(WritableWidget):
-    def __init__(self, anchor: Anchor, sizing: Sizing, text: str):
+    def __init__(self, anchor: Anchor, sizing: Sizing, text: list[str]) -> None:
         super().__init__(anchor, sizing, text)
-
-    def draw(
-        self, window: pg.Surface, pos: tuple[int, int], size: tuple[int, int]
-    ) -> None:
-        if not self.font:
-            return
-
-        self.rect = pg.Rect(pos, size)
-        pg.draw.rect(window, (255, 255, 255), self.rect)
-        text: pg.Surface = self.font.render(self.text, False, (0, 0, 255))
-        window.blit(text, pos)
 
 
 class Modal(Widget):
-    def __init__(self, anchor: Anchor, sizing: Sizing, title: str):
+    def __init__(self, anchor: Anchor, sizing: Sizing, title: str) -> None:
         super().__init__(anchor, sizing)
         self.title: str = title
         self.is_visible: bool = False
 
-    def toggle(self):
+    def toggle(self) -> None:
         self.is_visible = not self.is_visible
 
     def draw(

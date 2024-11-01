@@ -37,17 +37,16 @@ SceneManager.insertWidget("main_menu", menu_items)
 
 about_modal: widgets.Modal = widgets.Modal(Anchor.CENTER, Sizing.COVER, "About Page")
 about_modal.addWidget(
-    widgets.TextArea(Anchor.CENTER, Sizing.COVER, "This is an about page.")
-)
-about_modal.addWidget(
     widgets.TextArea(
-        Anchor.CENTER, Sizing.COVER, "This is another line of the about page."
+        Anchor.CENTER,
+        Sizing.COVER,
+        [
+            "This is an about page.",
+            "This is another line of the about page.",
+            "This is a\nmultiline\nparagraph.",
+        ],
     )
 )
-about_modal.addWidget(
-    widgets.TextArea(Anchor.CENTER, Sizing.COVER, "This is a\nmultiline\nparagraph.")
-)
-
 
 modal_idx: int = SceneManager.insertWidgetIdx("main_menu", about_modal)
 
