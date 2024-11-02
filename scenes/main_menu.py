@@ -3,8 +3,6 @@ from novelib.ui import widgets, Anchor, Sizing, Order, Link
 
 
 def create() -> None:
-    SceneManager.createFont("PressStart", "PressStart2P.ttf", 16)
-
     SceneManager.createScene("main_menu")
     SceneManager.insertWidget(
         "main_menu",

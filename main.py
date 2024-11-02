@@ -1,6 +1,9 @@
 import pygame as pg
 from novelib import SceneManager
-from scenes import main_menu
+
+SceneManager.createFont("PressStart", "PressStart2P.ttf", 16)
+
+import scenes as _
 
 
 def loop(window: pg.Surface, clock: pg.time.Clock) -> None:
@@ -19,8 +22,6 @@ def loop(window: pg.Surface, clock: pg.time.Clock) -> None:
 
 
 def main() -> None:
-    main_menu.create()
-    
     pg.init()
     window: pg.Surface = pg.display.set_mode((800, 600), pg.RESIZABLE)
     pg.display.set_caption("Window")
