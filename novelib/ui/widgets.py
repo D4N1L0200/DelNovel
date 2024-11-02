@@ -76,6 +76,7 @@ class Background(Widget):
 class ClickableWidget(Widget):
     def __init__(self, anchor: Anchor, sizing: Sizing) -> None:
         super().__init__(anchor, sizing)
+        self.is_hovering: bool = False
 
     def handleEvent(self, event: pg.event.Event) -> None:
         if event.type == pg.MOUSEBUTTONDOWN:
@@ -84,6 +85,10 @@ class ClickableWidget(Widget):
                     return
                 if self.rect.collidepoint(event.pos):
                     self.onClick(event.pos, event.button)
+        elif event.type == pg.MOUSEMOTION:
+            if not self.rect:
+                return
+            self.is_hovering = self.rect.collidepoint(event.pos)
 
     @abstractmethod
     def onClick(self, pos: tuple[int, int], mouse_button: int) -> None: ...
@@ -108,11 +113,14 @@ class WritableWidget(Widget):
             case Sizing.FILL:
                 pass
             case Sizing.COVER:
+                size = (0, 0)
                 for line in self.text:
                     text: pg.Surface = self.font.render(line, False, (0, 0, 0))
                     size = (max(size[0], text.get_width()), size[1] + text.get_height())
             case _:
                 pass  # TODO: raise
+
+        size = (size[0] + THEME.TEXT_PADDING, size[1] + THEME.TEXT_PADDING)
 
         return [], size
 
@@ -123,10 +131,17 @@ class WritableWidget(Widget):
             return
 
         self.rect = pg.Rect(pos, size)
-        pg.draw.rect(window, THEME.BG_COLOR, self.rect)
+        pg.draw.rect(window, THEME.OUTLINE_COLOR, self.rect, 1)
+
         for idx, line in enumerate(self.text):
             text: pg.Surface = self.font.render(line, False, THEME.TEXT_COLOR)
-            window.blit(text, (pos[0], pos[1] + idx * text.get_height()))
+            window.blit(
+                text,
+                (
+                    pos[0] + THEME.TEXT_PADDING // 2,
+                    pos[1] + idx * text.get_height() + THEME.TEXT_PADDING // 2,
+                ),
+            )
 
 
 class Button(WritableWidget, ClickableWidget):
@@ -144,6 +159,13 @@ class Button(WritableWidget, ClickableWidget):
 
     def onClick(self, pos: tuple[int, int], mouse_button: int) -> None:
         self.action.execute()
+        
+    def draw(self, window: pg.Surface, pos: tuple[int, int], size: tuple[int, int]) -> None:
+        if self.is_hovering:
+            self.rect = pg.Rect(pos, size)
+            pg.draw.rect(window, THEME.HOVER_COLOR, self.rect)
+
+        return super().draw(window, pos, size)
 
 
 class TextArea(WritableWidget):
@@ -177,7 +199,8 @@ class Modal(Widget):
             case _:
                 raise NotImplementedError
 
-        pg.draw.rect(window, (255, 255, 255), (*pos, *size), 1)
+        pg.draw.rect(window, THEME.BG_COLOR, (*pos, *size))
+        pg.draw.rect(window, THEME.OUTLINE_COLOR, (*pos, *size), 1)
 
         for idx, widget in enumerate(self.widgets):
             pos = (pos[0] + offsets[idx][0], pos[1] + offsets[idx][1])

@@ -1,3 +1,3 @@
-from .default import LightDefault, DarkDefault
+from .default import DarkDefault
 
 THEME = DarkDefault
