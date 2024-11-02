@@ -1,18 +1,8 @@
 # DelNovel
 
-**DelNovel** is a Python library designed to simplify the creation of modular user interfaces and game scenes using [Pygame](https://www.pygame.org/). It’s tailored for interactive story games, visual novels, and other applications requiring rich, flexible UI and scene management.
-
-Currently only has the internal system, so no graphical elements **yet**.
+**DelNovel** is a Python library designed to simplify the creation of modular user interfaces and game scenes using [Pygame](https://www.pygame.org/). It’s tailored for my own interactive story game that has visual novel and rpg elements.
 
 This project is a work in progress. Please report any bugs or feature requests to the [GitHub repository](https://github.com/D4N1L0200/DelNovel).
-
-## Key Features
-
--   **Customizable Scenes**: Easily create game scenes with custom backgrounds, widgets, and transitions.
--   **Widget-Based UI**: Modular components like buttons, modals, text areas, and containers support complex interfaces.
--   **Event Handling**: An extendable system for managing interactive widgets, with customizable actions and click events.
--   **Flexible Layout Options**: Utilize `Anchor` and `Sizing` options for precise positioning and scaling of UI elements.
--   **Theme Support (Planned)**: Seamlessly switch themes to alter widget appearances without changing their functionality.
 
 ## Installation
 
