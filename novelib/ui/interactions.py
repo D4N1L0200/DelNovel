@@ -13,6 +13,11 @@ class EmptyAction(Action):
         pass
 
 
+class ExitAction(Action):
+    def execute(self) -> None:
+        raise KeyboardInterrupt
+
+
 class SceneAction(Action):
     def __init__(self, scene_name: str) -> None:
         self.scene_name: str = scene_name
@@ -38,6 +43,10 @@ class Link:
     @staticmethod
     def toNone() -> EmptyAction:
         return EmptyAction()
+
+    @staticmethod
+    def toExit() -> ExitAction:
+        return ExitAction()
 
     @staticmethod
     def toScene(scene_name: str) -> SceneAction:

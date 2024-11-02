@@ -31,6 +31,22 @@ def create() -> None:
             Link.toScene("main_menu_settings"),
         )
     )
+    menu_items.addWidget(
+        widgets.Button(
+            Anchor.NONE,
+            Sizing.COVER,
+            "Debug",
+            Link.toScene("debug_menu"),
+        )
+    )
+    menu_items.addWidget(
+        widgets.Button(
+            Anchor.NONE,
+            Sizing.COVER,
+            "Exit",
+            Link.toExit(),
+        )
+    )
 
     SceneManager.insertWidget("main_menu", menu_items)
 

@@ -275,6 +275,20 @@ class Block(Widget):
                     (window.get_width() // 2) - (size[0] // 2),
                     (window.get_height() // 2) - (size[1] // 2),
                 )
+            case Anchor.TOP:
+                pos = ((window.get_width() // 2) - (size[0] // 2), 0)
+            case Anchor.BOTTOM:
+                pos = (
+                    (window.get_width() // 2) - (size[0] // 2),
+                    window.get_height() - size[1],
+                )
+            case Anchor.LEFT:
+                pos = (0, (window.get_height() // 2) - (size[1] // 2))
+            case Anchor.RIGHT:
+                pos = (
+                    window.get_width() - size[0],
+                    (window.get_height() // 2) - (size[1] // 2),
+                )
             case Anchor.TOPLEFT:
                 pos = (0, 0)
             case Anchor.TOPRIGHT:

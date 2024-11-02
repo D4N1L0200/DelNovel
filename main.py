@@ -30,7 +30,10 @@ def main() -> None:
 
     SceneManager.loadScene("main_menu")
 
-    loop(window, clock)
+    try:
+        loop(window, clock)
+    except KeyboardInterrupt:
+        pass
 
     pg.quit()
 
