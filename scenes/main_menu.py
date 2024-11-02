@@ -2,7 +2,7 @@ from typing import Optional
 from novelib import SceneManager
 from novelib.ui import widgets, Anchor, Sizing, Order, Link
 
-SceneManager.createFont("PressStart", "PressStart2P.ttf", 24)
+SceneManager.createFont("PressStart", "PressStart2P.ttf", 16)
 
 SceneManager.createScene("main_menu")
 SceneManager.insertWidget(
@@ -41,9 +41,11 @@ about_modal.addWidget(
         Anchor.CENTER,
         Sizing.COVER,
         [
-            "This is an about page.",
-            "This is another line of the about page.",
-            "This is a\nmultiline\nparagraph.",
+            "\t\t\t\tAbout DelNovel",
+            "This is a project that started as a simple UI manager for pygame, but the goal is to have a full game in the future.",
+            "\nAn open world rpg that allows the player to travel between 'dimensions' that were chosen by my friends.",
+            "\nI don't know for how long I'll keep working on it, but I hope it will be enough to satisfy at least one of my friends.",
+            "\nI hope that you enjoy the game! - Del",
         ],
     )
 )

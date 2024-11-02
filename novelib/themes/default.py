@@ -8,3 +8,4 @@ class DarkDefault:
 
     TEXT_COLOR = Color(255, 255, 255)
     TEXT_PADDING = 10
+    LINE_SPACING = 5

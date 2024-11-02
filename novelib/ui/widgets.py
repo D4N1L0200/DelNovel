@@ -31,25 +31,25 @@ class Widget(ABC):
             case Sizing.FILL:
                 pass
             case Sizing.COVER:
-                size = (0, 0)
+                out_size = (0, 0)
 
                 match self.order:
                     case Order.VERTICAL:
                         for widget in self.widgets:
                             _, widg_size = widget.calcSize(size)
-                            offsets.append((0, size[1]))
-                            size = (max(size[0], widg_size[0]), widg_size[1])
+                            offsets.append((0, out_size[1]))
+                            out_size = (max(out_size[0], widg_size[0]), widg_size[1])
                     case Order.HORIZONTAL:
                         for widget in self.widgets:
                             _, widg_size = widget.calcSize(size)
-                            offsets.append((size[0], 0))
-                            size = (widg_size[0], max(size[1], widg_size[1]))
+                            offsets.append((out_size[0], 0))
+                            out_size = (widg_size[0], max(out_size[1], widg_size[1]))
                     case _:
                         pass  # TODO: raise
             case _:
                 pass  # TODO: raise
 
-        return offsets, size
+        return offsets, out_size
 
     @abstractmethod
     def draw(
@@ -99,8 +99,10 @@ class WritableWidget(Widget):
 
     def __init__(self, anchor: Anchor, sizing: Sizing, text: list[str]) -> None:
         super().__init__(anchor, sizing)
+        self.original_text: list[str] = text
         self.text: list[str] = []
         for line in text:
+            line = line.replace("\t", "TEST")
             self.text.extend(line.split("\n"))
         self.font: pg.font.Font = WritableWidget.font
 
@@ -109,20 +111,68 @@ class WritableWidget(Widget):
     ) -> tuple[list[tuple[int, int]], tuple[int, int]]:
         if not self.font:
             return [], (0, 0)  # TODO: raise
+
         match self.sizing:
             case Sizing.FILL:
                 pass
             case Sizing.COVER:
+                max_size = size
                 size = (0, 0)
-                for line in self.text:
+
+                space: pg.Surface = self.font.render(" ", False, (0, 0, 0))
+                char_width: int = space.get_width()
+
+                idx: int = 0
+                while idx < len(self.text):
+                    line: str = self.text[idx]
+
                     text: pg.Surface = self.font.render(line, False, (0, 0, 0))
-                    size = (max(size[0], text.get_width()), size[1] + text.get_height())
+
+                    if text.get_width() < max_size[0]:
+                        size = (
+                            max(size[0], text.get_width()),
+                            size[1] + text.get_height(),
+                        )
+                        idx += 1
+                        continue
+
+                    lines: list[str] = []
+                    while text.get_width() > max_size[0]:
+                        max_char: int = max_size[0] // char_width
+                        last_space: int = line[:max_char].rfind(" ", 0, max_char)
+                        cut_line = line[:last_space].strip()
+                        line = line[last_space:].strip()
+                        lines.append(cut_line)
+                        text = self.font.render(line, False, (0, 0, 0))
+                        size = (
+                            max(size[0], char_width * len(cut_line)),
+                            size[1] + text.get_height(),
+                        )
+                    lines.append(line)
+
+                    self.text.pop(idx)
+                    for idx_offset, line in enumerate(lines):
+                        self.text.insert(idx + idx_offset, line)
+                    idx += len(lines)
+                    idx += 1
             case _:
                 pass  # TODO: raise
 
-        size = (size[0] + THEME.TEXT_PADDING, size[1] + THEME.TEXT_PADDING)
+        size = (
+            size[0] + THEME.TEXT_PADDING,
+            size[1] + THEME.TEXT_PADDING + (len(self.text) - 1) * THEME.LINE_SPACING,
+        )
 
         return [], size
+
+    def handleEvent(self, event: pg.event.Event) -> None:
+        super().handleEvent(event)
+
+        if event.type == pg.VIDEORESIZE:
+            self.text = []
+            for line in self.original_text:
+                line = line.replace("\t", "    ")
+                self.text.extend(line.split("\n"))
 
     def draw(
         self, window: pg.Surface, pos: tuple[int, int], size: tuple[int, int]
@@ -139,7 +189,9 @@ class WritableWidget(Widget):
                 text,
                 (
                     pos[0] + THEME.TEXT_PADDING // 2,
-                    pos[1] + idx * text.get_height() + THEME.TEXT_PADDING // 2,
+                    pos[1]
+                    + idx * (text.get_height() + THEME.LINE_SPACING)
+                    + THEME.TEXT_PADDING // 2,
                 ),
             )
 
@@ -159,8 +211,10 @@ class Button(WritableWidget, ClickableWidget):
 
     def onClick(self, pos: tuple[int, int], mouse_button: int) -> None:
         self.action.execute()
-        
-    def draw(self, window: pg.Surface, pos: tuple[int, int], size: tuple[int, int]) -> None:
+
+    def draw(
+        self, window: pg.Surface, pos: tuple[int, int], size: tuple[int, int]
+    ) -> None:
         if self.is_hovering:
             self.rect = pg.Rect(pos, size)
             pg.draw.rect(window, THEME.HOVER_COLOR, self.rect)
