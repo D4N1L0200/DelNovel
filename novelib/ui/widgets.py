@@ -1,12 +1,14 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
 from .layout import Anchor, Sizing, Order
-
-# from .interactions import Action # TODO: Fix circular import
-from typing import TypeVar, Optional
+from typing import Optional
 from ..themes import THEME
 import pygame as pg
 
-T = TypeVar("T", bound="Widget")
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .interactions import Action
 
 
 class Widget(ABC):
@@ -19,13 +21,14 @@ class Widget(ABC):
         self.widgets: list[Widget] = []
         self.rect: Optional[pg.Rect] = None
 
-    def addWidget(self, widget: T) -> None:
+    def addWidget(self, widget: Widget) -> None:
         self.widgets.append(widget)
 
     def calcSize(
         self, size: tuple[int, int]
     ) -> tuple[list[tuple[int, int]], tuple[int, int]]:
         offsets: list[tuple[int, int]] = []
+        out_size: tuple[int, int] = (0, 0)
 
         match self.sizing:
             case Sizing.FILL:
@@ -44,10 +47,6 @@ class Widget(ABC):
                             _, widg_size = widget.calcSize(size)
                             offsets.append((out_size[0], 0))
                             out_size = (widg_size[0], max(out_size[1], widg_size[1]))
-                    case _:
-                        pass  # TODO: raise
-            case _:
-                pass  # TODO: raise
 
         return offsets, out_size
 
@@ -104,7 +103,7 @@ class WritableWidget(Widget):
         for line in text:
             line = line.replace("\t", "TEST")
             self.text.extend(line.split("\n"))
-        self.font: pg.font.Font = WritableWidget.font
+        self.font: Optional[pg.font.Font] = WritableWidget.font
 
     def calcSize(
         self, size: tuple[int, int]
@@ -155,8 +154,6 @@ class WritableWidget(Widget):
                         self.text.insert(idx + idx_offset, line)
                     idx += len(lines)
                     idx += 1
-            case _:
-                pass  # TODO: raise
 
         size = (
             size[0] + THEME.TEXT_PADDING,
@@ -202,12 +199,10 @@ class Button(WritableWidget, ClickableWidget):
         anchor: Anchor,
         sizing: Sizing,
         text: str,
-        action,
+        action: Action,
     ) -> None:
-        # def __init__(self, anchor: Anchor, sizing: Sizing, text: str, font: pg.font.Font, action: Action):
         super().__init__(anchor, sizing, [text])
-        self.action = action
-        # self.action: Action = action
+        self.action: Action = action
 
     def onClick(self, pos: tuple[int, int], mouse_button: int) -> None:
         self.action.execute()

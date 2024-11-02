@@ -1,6 +1,5 @@
 import pygame as pg
-from typing import Optional
-from .ui.widgets import Widget, WritableWidget, ClickableWidget
+from .ui.widgets import Widget, WritableWidget
 
 
 class Scene:
