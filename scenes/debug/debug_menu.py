@@ -19,8 +19,16 @@ def create() -> None:
         widgets.Button(
             Anchor.NONE,
             Sizing.COVER,
-            "Layout tests...",
+            "Layout Anchors",
             Link.toScene("debug_layout_anchor"),
+        )
+    )
+    debug_items.addWidget(
+        widgets.Button(
+            Anchor.NONE,
+            Sizing.COVER,
+            "Typed Text",
+            Link.toScene("debug_typed_text"),
         )
     )
     debug_items.addWidget(

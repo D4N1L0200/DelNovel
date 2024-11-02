@@ -60,9 +60,9 @@ def create() -> None:
             [
                 "\t\t\t\tAbout DelNovel",
                 "This is a project that started as a simple UI manager for pygame, but the goal is to have a full game in the future.",
-                "\nAn open world rpg that allows the player to travel between 'dimensions' that were chosen by my friends.",
-                "\nI don't know for how long I'll keep working on it, but I hope it will be enough to satisfy at least one of my friends.",
-                "\nI hope that you enjoy the game! - Del",
+                "An open world rpg that allows the player to travel between 'dimensions' that were chosen by my friends.",
+                "I don't know for how long I'll keep working on it, but I hope it will be enough to satisfy at least one of my friends.",
+                "I hope that you enjoy the game! - Del",
             ],
         )
     )

@@ -4,6 +4,7 @@ from .layout import Anchor, Sizing, Order
 from typing import Optional
 from ..themes import THEME
 import pygame as pg
+from time import time
 
 from typing import TYPE_CHECKING
 
@@ -107,6 +108,7 @@ class WritableWidget(Widget):
         for line in text:
             line = line.replace("\t", "TEST")
             self.text.extend(line.split("\n"))
+        self.text = [line for line in self.text if len(line)]
         self.font: Optional[pg.font.Font] = WritableWidget.font
 
     def calcSize(
@@ -224,6 +226,74 @@ class Button(WritableWidget, ClickableWidget):
 class TextArea(WritableWidget):
     def __init__(self, anchor: Anchor, sizing: Sizing, text: list[str]) -> None:
         super().__init__(anchor, sizing, text)
+
+
+class TypedTextArea(WritableWidget):
+    def __init__(self, anchor: Anchor, sizing: Sizing, text: list[str], typing_speed: float = 0.0) -> None:
+        super().__init__(anchor, sizing, text)
+        self.display_text: list[str] = [""]
+        self.line_idx: int = 0
+        self.char_idx: int = 0
+        self.typing_speed: float = typing_speed
+        self.last_update: float = time()
+
+    def update(self) -> None:
+        self.text = [line for line in self.text if len(line)]
+        
+        if self.line_idx >= len(self.text):
+            return
+        
+        current_time: float = time()
+        if current_time - self.last_update < self.typing_speed:
+            return
+
+        while True:
+            if self.char_idx >= len(self.text[self.line_idx]):
+                self.line_idx += 1
+                self.char_idx = 0
+                self.display_text.append("")
+            
+            if self.line_idx >= len(self.text):
+                return
+
+            next_char = self.text[self.line_idx][self.char_idx]
+
+            if next_char == " ":
+                self.char_idx += 1
+                continue
+
+            if next_char:
+                break
+
+        self.display_text[self.line_idx] = self.text[self.line_idx][
+            : self.char_idx + 1
+        ]
+
+        self.char_idx += 1
+        self.last_update = current_time
+
+    def draw(
+        self, window: pg.Surface, pos: tuple[int, int], size: tuple[int, int]
+    ) -> None:
+        if not self.font:
+            return
+
+        self.update()
+
+        self.rect = pg.Rect(pos, size)
+        pg.draw.rect(window, THEME.OUTLINE_COLOR, self.rect, 1)
+
+        for idx, line in enumerate(self.display_text):
+            text: pg.Surface = self.font.render(line, False, THEME.TEXT_COLOR)
+            window.blit(
+                text,
+                (
+                    pos[0] + THEME.TEXT_PADDING // 2,
+                    pos[1]
+                    + idx * (text.get_height() + THEME.LINE_SPACING)
+                    + THEME.TEXT_PADDING // 2,
+                ),
+            )
 
 
 class Modal(Widget):
