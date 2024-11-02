@@ -34,19 +34,23 @@ class Widget(ABC):
             case Sizing.FILL:
                 pass
             case Sizing.COVER:
-                out_size = (0, 0)
-
                 match self.order:
                     case Order.VERTICAL:
                         for widget in self.widgets:
                             _, widg_size = widget.calcSize(size)
                             offsets.append((0, out_size[1]))
-                            out_size = (max(out_size[0], widg_size[0]), widg_size[1])
+                            out_size = (
+                                max(out_size[0], widg_size[0]),
+                                out_size[1] + widg_size[1],
+                            )
                     case Order.HORIZONTAL:
                         for widget in self.widgets:
                             _, widg_size = widget.calcSize(size)
                             offsets.append((out_size[0], 0))
-                            out_size = (widg_size[0], max(out_size[1], widg_size[1]))
+                            out_size = (
+                                out_size[0] + widg_size[0],
+                                max(out_size[1], widg_size[1]),
+                            )
 
         return offsets, out_size
 
@@ -285,5 +289,13 @@ class Block(Widget):
         pg.draw.rect(window, (255, 255, 255), (*pos, *size), 1)
 
         for idx, widget in enumerate(self.widgets):
-            pos = (pos[0] + offsets[idx][0], pos[1] + offsets[idx][1])
-            widget.draw(window, pos, size)
+            widg_pos = (pos[0] + offsets[idx][0], pos[1] + offsets[idx][1])
+            widg_size: tuple[int, int] = widget.calcSize(size)[1]
+
+            match self.order:
+                case Order.VERTICAL:
+                    widg_size = (size[0], widg_size[1])
+                case Order.HORIZONTAL:
+                    widg_size = (widg_size[0], size[1])
+
+            widget.draw(window, widg_pos, widg_size)
