@@ -8,6 +8,11 @@ class Action(ABC):
     def execute(self) -> None: ...
 
 
+class EmptyAction(Action):
+    def execute(self) -> None:
+        pass
+
+
 class SceneAction(Action):
     def __init__(self, scene_name: str) -> None:
         self.scene_name: str = scene_name
@@ -30,6 +35,10 @@ class ModalAction(Action):
 
 
 class Link:
+    @staticmethod
+    def toNone() -> EmptyAction:
+        return EmptyAction()
+
     @staticmethod
     def toScene(scene_name: str) -> SceneAction:
         return SceneAction(scene_name)
