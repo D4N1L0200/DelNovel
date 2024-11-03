@@ -314,6 +314,7 @@ class ChatBox(TypedTextArea, ClickableWidget):
 
     def onClick(self, pos: tuple[int, int], mouse_button: int) -> None:
         from ..chat_manager import ChatManager
+
         ChatManager.advance()
 
 
@@ -367,27 +368,39 @@ class Block(Widget):
                     (window.get_height() // 2) - (size[1] // 2),
                 )
             case Anchor.TOP:
-                pos = ((window.get_width() // 2) - (size[0] // 2), 0)
+                pos = ((window.get_width() // 2) - (size[0] // 2), THEME.WIDGET_PADDING)
             case Anchor.BOTTOM:
                 pos = (
                     (window.get_width() // 2) - (size[0] // 2),
-                    window.get_height() - size[1],
+                    window.get_height() - size[1] - THEME.WIDGET_PADDING,
                 )
             case Anchor.LEFT:
-                pos = (0, (window.get_height() // 2) - (size[1] // 2))
+                pos = (
+                    THEME.WIDGET_PADDING,
+                    (window.get_height() // 2) - (size[1] // 2),
+                )
             case Anchor.RIGHT:
                 pos = (
-                    window.get_width() - size[0],
+                    window.get_width() - size[0] - THEME.WIDGET_PADDING,
                     (window.get_height() // 2) - (size[1] // 2),
                 )
             case Anchor.TOPLEFT:
-                pos = (0, 0)
+                pos = (THEME.WIDGET_PADDING, THEME.WIDGET_PADDING)
             case Anchor.TOPRIGHT:
-                pos = (window.get_width() - size[0], 0)
+                pos = (
+                    window.get_width() - size[0] - THEME.WIDGET_PADDING,
+                    THEME.WIDGET_PADDING,
+                )
             case Anchor.BOTTOMLEFT:
-                pos = (0, window.get_height() - size[1])
+                pos = (
+                    THEME.WIDGET_PADDING,
+                    window.get_height() - size[1] - THEME.WIDGET_PADDING,
+                )
             case Anchor.BOTTOMRIGHT:
-                pos = (window.get_width() - size[0], window.get_height() - size[1])
+                pos = (
+                    window.get_width() - size[0] - THEME.WIDGET_PADDING,
+                    window.get_height() - size[1] - THEME.WIDGET_PADDING,
+                )
             case _:
                 raise NotImplementedError
 
