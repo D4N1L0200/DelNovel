@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from ..scene_manager import SceneManager
 from .widgets import Widget, Modal
+from ..chat_manager import ChatManager
 
 
 class Action(ABC):
@@ -38,7 +39,13 @@ class ModalAction(Action):
         else:
             raise TypeError("Modal must be a Modal Widget")
 
-
+class ChatAction(Action):
+    def __init__(self, chat_source: str) -> None:
+        self.chat_source: str = chat_source
+    
+    def execute(self) -> None:
+        ChatManager.loadChat(self.chat_source)
+    
 class Link:
     @staticmethod
     def toNone() -> EmptyAction:
@@ -55,3 +62,7 @@ class Link:
     @staticmethod
     def toModal(modal_idx: int) -> ModalAction:
         return ModalAction(modal_idx)
+    
+    @staticmethod
+    def toChat(chat_source: str) -> ChatAction:
+        return ChatAction(chat_source)

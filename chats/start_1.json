@@ -1,0 +1,152 @@
+{
+	"characters": { "del": "?" },
+	"option_pools": {
+		"main": [
+			{
+				"text": "Why do you ask?",
+				"link": "whyask"
+			},
+			{
+				"text": "Who are you?",
+				"link": "whoyou"
+			},
+			{
+				"text": "Who am I?",
+				"link": "whoi"
+			},
+			{
+				"text": "Why am I here?",
+				"link": "whyhere"
+			}
+		]
+	},
+	"paths": {
+		"start": {
+			"actions": [
+				{
+					"type": "message",
+					"name": "del",
+					"text": "So... Why are you here?"
+				}
+			],
+			"option_pool": "main"
+		},
+		"whyask": {
+			"actions": [
+				{
+					"type": "message",
+					"name": "del",
+					"text": "It's not everyday that someone appears here."
+				},
+				{
+					"type": "message",
+					"name": "del",
+					"text": "Again, why are you here?"
+				}
+			],
+			"options": "main"
+		},
+		"whoyou": {
+			"actions": [
+				{
+					"type": "message",
+					"name": "del",
+					"text": "I have a lot of names, you'll figure them out later."
+				},
+				{
+					"type": "message",
+					"name": "del",
+					"text": "But for now, call me Del."
+				},
+				{
+					"type": "trigger",
+					"trigger": "change_name",
+					"source": "del",
+					"name": "Del"
+				}
+			],
+			"options": "main"
+		},
+		"whoi": {
+			"actions": [
+				{
+					"type": "message",
+					"name": "del",
+					"text": "That depends on which 'I' you're talking about..."
+				},
+				{
+					"type": "message",
+					"name": "del",
+					"text": "If you mean the one right here, it doesn't have a name yet."
+				},
+				{
+					"type": "message",
+					"name": "del",
+					"text": "And if you mean the one outside the screen, I'll try to discover that."
+				},
+				{
+					"type": "trigger",
+					"trigger": "add_option",
+					"pool": "main",
+					"option": {
+						"text": "Outside the screen?",
+						"link": "outsidescreen"
+					}
+				}
+			],
+			"options": "main"
+		},
+		"whyhere": {
+			"actions": [
+				{
+					"type": "message",
+					"name": "del",
+					"text": "That's what I asked you... You've just appeared out of nowhere."
+				}
+			],
+			"options": "main"
+		},
+		"outsidescreen": {
+			"actions": [
+				{
+					"type": "message",
+					"name": "del",
+					"text": "Yeah, this is a game right?"
+				},
+				{
+					"type": "message",
+					"name": "del",
+					"text": "That information is stored for as long as I can remember."
+				},
+				{
+					"type": "trigger",
+					"trigger": "add_option",
+					"pool": "main",
+					"option": {
+						"text": "What kind of information do you have?",
+						"link": "whatinformation"
+					}
+				},
+				{
+					"type": "trigger",
+					"trigger": "add_option",
+					"pool": "main",
+					"option": {
+						"text": "Who told you this is a game?",
+						"link": "whotold"
+					}
+				},
+				{
+					"type": "trigger",
+					"trigger": "add_option",
+					"pool": "main",
+					"option": {
+						"text": "Who told you this is a game?",
+						"link": "whotold"
+					}
+				}
+			],
+			"options": "main"
+		}
+	}
+}

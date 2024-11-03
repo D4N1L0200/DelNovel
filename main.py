@@ -1,5 +1,5 @@
 import pygame as pg
-from novelib import SceneManager
+from novelib import SceneManager, ChatManager
 
 SceneManager.createFont("PressStart", "PressStart2P.ttf", 16)
 
@@ -13,6 +13,8 @@ def loop(window: pg.Surface, clock: pg.time.Clock) -> None:
                 return
 
             SceneManager.handleEvent(event)
+            
+        ChatManager.update()
 
         window.fill((0, 0, 0))
         SceneManager.drawScene(window)

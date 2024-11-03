@@ -5,6 +5,7 @@ from .ui.widgets import Widget, WritableWidget
 class Scene:
     def __init__(self) -> None:
         self.widgets: list[Widget] = []
+        self.chat_box_idx: int = -1
 
     def addWidget(self, widget: Widget) -> int:
         self.widgets.append(widget)
@@ -53,6 +54,11 @@ class SceneManager:
             raise ValueError(f"Scene {scene_name} not found")
 
         return cls.scenes[scene_name].addWidget(widget)
+
+    @classmethod
+    def insertChatBox(cls, scene_name: str, widget: Widget) -> None:
+        chat_box_idx: int = cls.insertWidgetIdx(scene_name, widget)
+        cls.scenes[scene_name].chat_box_idx = chat_box_idx
 
     @classmethod
     def loadScene(cls, scene_name: str) -> None:

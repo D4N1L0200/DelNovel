@@ -229,7 +229,9 @@ class TextArea(WritableWidget):
 
 
 class TypedTextArea(WritableWidget):
-    def __init__(self, anchor: Anchor, sizing: Sizing, text: list[str], typing_speed: float = 0.0) -> None:
+    def __init__(
+        self, anchor: Anchor, sizing: Sizing, text: list[str], typing_speed: float = 0.0
+    ) -> None:
         super().__init__(anchor, sizing, text)
         self.display_text: list[str] = [""]
         self.line_idx: int = 0
@@ -239,10 +241,10 @@ class TypedTextArea(WritableWidget):
 
     def update(self) -> None:
         self.text = [line for line in self.text if len(line)]
-        
+
         if self.line_idx >= len(self.text):
             return
-        
+
         current_time: float = time()
         if current_time - self.last_update < self.typing_speed:
             return
@@ -252,7 +254,7 @@ class TypedTextArea(WritableWidget):
                 self.line_idx += 1
                 self.char_idx = 0
                 self.display_text.append("")
-            
+
             if self.line_idx >= len(self.text):
                 return
 
@@ -265,9 +267,7 @@ class TypedTextArea(WritableWidget):
             if next_char:
                 break
 
-        self.display_text[self.line_idx] = self.text[self.line_idx][
-            : self.char_idx + 1
-        ]
+        self.display_text[self.line_idx] = self.text[self.line_idx][: self.char_idx + 1]
 
         self.char_idx += 1
         self.last_update = current_time
@@ -294,6 +294,27 @@ class TypedTextArea(WritableWidget):
                     + THEME.TEXT_PADDING // 2,
                 ),
             )
+
+
+class ChatBox(TypedTextArea, ClickableWidget):
+    def __init__(
+        self, anchor: Anchor, sizing: Sizing, typing_speed: float = 0.0
+    ) -> None:
+        super().__init__(anchor, sizing, [], typing_speed)
+
+    def reset(self) -> None:
+        self.display_text: list[str] = [""]
+        self.line_idx: int = 0
+        self.char_idx: int = 0
+        self.last_update: float = time()
+
+    def setText(self, text: list[str]) -> None:
+        self.reset()
+        self.text = text
+
+    def onClick(self, pos: tuple[int, int], mouse_button: int) -> None:
+        from ..chat_manager import ChatManager
+        ChatManager.advance()
 
 
 class Modal(Widget):

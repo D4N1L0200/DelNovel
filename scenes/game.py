@@ -1,4 +1,4 @@
-from novelib import SceneManager
+from novelib import SceneManager, ChatManager
 from novelib.ui import widgets, Anchor, Sizing, Order, Link
 
 
@@ -9,29 +9,10 @@ def create() -> None:
         widgets.Background(Anchor.TOPLEFT, Sizing.FILL, "assets/images/bg_menu.jpg"),
     )
 
-    temp_items: widgets.Block = widgets.Block(
-        Anchor.CENTER,
-        Sizing.COVER,
-        Order.VERTICAL,
+    pause_modal: widgets.Modal = widgets.Modal(
+        Anchor.CENTER, Sizing.COVER, "Pause Modal"
     )
-
-    temp_items.addWidget(
-        widgets.Button(
-            Anchor.NONE,
-            Sizing.COVER,
-            "What a nice game...",
-            Link.toNone(),
-        )
-    )
-    temp_items.addWidget(
-        widgets.Button(
-            Anchor.NONE,
-            Sizing.COVER,
-            "This crashes the game.",
-            Link.toScene("crash"),
-        )
-    )
-    temp_items.addWidget(
+    pause_modal.addWidget(
         widgets.Button(
             Anchor.NONE,
             Sizing.COVER,
@@ -39,5 +20,47 @@ def create() -> None:
             Link.toScene("main_menu"),
         )
     )
+    modal_idx: int = SceneManager.insertWidgetIdx("game_start", pause_modal)
 
-    SceneManager.insertWidget("game_start", temp_items)
+    pause_block: widgets.Block = widgets.Block(
+        Anchor.TOPLEFT,
+        Sizing.COVER,
+        Order.VERTICAL,
+    )
+    pause_block.addWidget(
+        widgets.Button(
+            Anchor.NONE,
+            Sizing.COVER,
+            "Pause.",
+            Link.toModal(modal_idx),
+        )
+    )
+    SceneManager.insertWidget("game_start", pause_block)
+
+    trigger_block: widgets.Block = widgets.Block(
+        Anchor.TOPRIGHT,
+        Sizing.COVER,
+        Order.VERTICAL,
+    )
+    trigger_block.addWidget(
+        widgets.Button(
+            Anchor.NONE,
+            Sizing.COVER,
+            "Trigger chat.",
+            Link.toChat("start_1"),
+        )
+    )
+    SceneManager.insertWidget("game_start", trigger_block)
+
+    chat_block: widgets.Block = widgets.Block(
+        Anchor.BOTTOM,
+        Sizing.COVER,
+        Order.VERTICAL,
+    )
+    chat_block.addWidget(
+        widgets.ChatBox(
+            Anchor.NONE,
+            Sizing.COVER,
+        )
+    )
+    SceneManager.insertChatBox("game_start", chat_block)
