@@ -39,13 +39,20 @@ class ModalAction(Action):
         else:
             raise TypeError("Modal must be a Modal Widget")
 
-class ChatAction(Action):
+
+class LoadChatAction(Action):
     def __init__(self, chat_source: str) -> None:
         self.chat_source: str = chat_source
-    
+
     def execute(self) -> None:
         ChatManager.loadChat(self.chat_source)
-    
+
+
+class ResetChatAction(Action):
+    def execute(self) -> None:
+        ChatManager.unloadChat()
+
+
 class Link:
     @staticmethod
     def toNone() -> EmptyAction:
@@ -62,7 +69,11 @@ class Link:
     @staticmethod
     def toModal(modal_idx: int) -> ModalAction:
         return ModalAction(modal_idx)
-    
+
     @staticmethod
-    def toChat(chat_source: str) -> ChatAction:
-        return ChatAction(chat_source)
+    def toChat(chat_source: str) -> LoadChatAction:
+        return LoadChatAction(chat_source)
+
+    @staticmethod
+    def toResetChat() -> ResetChatAction:
+        return ResetChatAction()

@@ -7,6 +7,14 @@ class Scene:
         self.widgets: list[Widget] = []
         self.chat_box_idx: int = -1
 
+    def load(self) -> None:
+        for widget in self.widgets:
+            widget.load()
+
+    def unload(self) -> None:
+        for widget in self.widgets:
+            widget.unload()
+
     def addWidget(self, widget: Widget) -> int:
         self.widgets.append(widget)
 
@@ -64,6 +72,8 @@ class SceneManager:
     def loadScene(cls, scene_name: str) -> None:
         if scene_name not in cls.scenes:
             raise ValueError(f"Scene {scene_name} not found")
+
+        cls.active_scene.unload()
 
         cls.active_scene = cls.scenes[scene_name]
 

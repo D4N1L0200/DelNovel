@@ -17,7 +17,7 @@ class ChatManager:
     option_pools: dict[str, list[dict[str, str]]] = {}
     paths: dict[str, Path] = {}
     curr_path: str = "start"
-    i: int = 0
+    curr_action: int = 0
 
     @classmethod
     def setChatBoxIdx(cls, idx: int) -> None:
@@ -37,12 +37,20 @@ class ChatManager:
         cls.advance()
 
     @classmethod
+    def unloadChat(cls) -> None:
+        cls.characters = {}
+        cls.option_pools = {}
+        cls.paths = {}
+        cls.curr_path = "start"
+        cls.curr_action = 0
+
+    @classmethod
     def sendChat(cls, text: str) -> None:
         chat_box: Union[Widget, ChatBox] = SceneManager.active_scene.widgets[
             cls.chat_box_idx
         ].widgets[0]
         if isinstance(chat_box, ChatBox):
-            chat_box.setText([text])
+            chat_box.setText(text)
 
     @classmethod
     def update(cls) -> None:
@@ -53,23 +61,20 @@ class ChatManager:
 
     @classmethod
     def advance(cls) -> None:
-        if cls.i > 5:
-            cls.i = 0
+        path: Path = cls.paths[cls.curr_path]
+        actions: list[dict[str, str]] = path["actions"]
 
-        match cls.i:
-            case 0:
-                cls.sendChat("Zero")
-            case 1:
-                cls.sendChat("One")
-            case 2:
-                cls.sendChat("Two")
-            case 3:
-                cls.sendChat("Three")
-            case 4:
-                cls.sendChat("Four")
-            case 5:
-                cls.sendChat("Five")
-            case _:
-                cls.i = 0
+        if cls.curr_action < len(actions):
+            action = actions[cls.curr_action]
+            cls.curr_action += 1
 
-        cls.i += 1
+            if action["type"] == "message":
+                character = cls.characters[action["name"]]
+                cls.sendChat(f"{character}: {action["text"]}")
+        else:
+            options: list[dict[str, str]] = cls.option_pools[path["option_pool"]]
+            cls.sendChat(
+                "\n".join(
+                    [f"{i + 1}. {option['text']}" for i, option in enumerate(options)]
+                )
+            )

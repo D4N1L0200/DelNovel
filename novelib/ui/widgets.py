@@ -22,6 +22,11 @@ class Widget(ABC):
         self.widgets: list[Widget] = []
         self.rect: Optional[pg.Rect] = None
 
+    def load(self) -> None: ...
+    def unload(self) -> None:
+        for widget in self.widgets:
+            widget.unload()
+
     def addWidget(self, widget: Widget) -> None:
         self.widgets.append(widget)
 
@@ -106,10 +111,13 @@ class WritableWidget(Widget):
         self.original_text: list[str] = text
         self.text: list[str] = []
         for line in text:
-            line = line.replace("\t", "TEST")
             self.text.extend(line.split("\n"))
         self.text = [line for line in self.text if len(line)]
         self.font: Optional[pg.font.Font] = WritableWidget.font
+
+    def setText(self, text: str) -> None:
+        self.text = text.split("\n")
+        self.text = [line for line in self.text if len(line)]
 
     def calcSize(
         self, size: tuple[int, int]
@@ -239,6 +247,13 @@ class TypedTextArea(WritableWidget):
         self.typing_speed: float = typing_speed
         self.last_update: float = time()
 
+    def unload(self) -> None:
+        self.display_text = [""]
+        self.line_idx = 0
+        self.char_idx = 0
+        self.last_update = time()
+        return super().unload()
+
     def update(self) -> None:
         self.text = [line for line in self.text if len(line)]
 
@@ -280,6 +295,9 @@ class TypedTextArea(WritableWidget):
 
         self.update()
 
+        if not any(self.display_text):
+            return
+
         self.rect = pg.Rect(pos, size)
         pg.draw.rect(window, THEME.OUTLINE_COLOR, self.rect, 1)
 
@@ -298,19 +316,27 @@ class TypedTextArea(WritableWidget):
 
 class ChatBox(TypedTextArea, ClickableWidget):
     def __init__(
-        self, anchor: Anchor, sizing: Sizing, typing_speed: float = 0.0
+        self,
+        anchor: Anchor,
+        sizing: Sizing,
+        reset_action: Action,
+        typing_speed: float = 0.0,
     ) -> None:
         super().__init__(anchor, sizing, [], typing_speed)
+        self.reset_action: Action = reset_action
 
-    def reset(self) -> None:
-        self.display_text: list[str] = [""]
-        self.line_idx: int = 0
-        self.char_idx: int = 0
-        self.last_update: float = time()
+    def setText(self, text: str) -> None:
+        self.text = []
+        self.display_text = [""]
+        self.line_idx = 0
+        self.char_idx = 0
+        self.last_update = time()
+        super().setText(text)
 
-    def setText(self, text: list[str]) -> None:
-        self.reset()
-        self.text = text
+    def unload(self) -> None:
+        self.text = []
+        self.reset_action.execute()
+        return super().unload()
 
     def onClick(self, pos: tuple[int, int], mouse_button: int) -> None:
         from ..chat_manager import ChatManager
@@ -323,6 +349,10 @@ class Modal(Widget):
         super().__init__(anchor, sizing)
         self.title: str = title
         self.is_visible: bool = False
+
+    def unload(self) -> None:
+        self.is_visible = False
+        return super().unload()
 
     def toggle(self) -> None:
         self.is_visible = not self.is_visible
@@ -404,7 +434,7 @@ class Block(Widget):
             case _:
                 raise NotImplementedError
 
-        pg.draw.rect(window, (255, 255, 255), (*pos, *size), 1)
+        # pg.draw.rect(window, (255, 255, 255), (*pos, *size), 1)
 
         for idx, widget in enumerate(self.widgets):
             widg_pos = (pos[0] + offsets[idx][0], pos[1] + offsets[idx][1])

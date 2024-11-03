@@ -1,4 +1,4 @@
-from novelib import SceneManager, ChatManager
+from novelib import SceneManager
 from novelib.ui import widgets, Anchor, Sizing, Order, Link
 
 
@@ -58,9 +58,6 @@ def create() -> None:
         Order.VERTICAL,
     )
     chat_block.addWidget(
-        widgets.ChatBox(
-            Anchor.NONE,
-            Sizing.COVER,
-        )
+        widgets.ChatBox(Anchor.NONE, Sizing.COVER, Link.toResetChat(), 0.04)
     )
     SceneManager.insertChatBox("game_start", chat_block)

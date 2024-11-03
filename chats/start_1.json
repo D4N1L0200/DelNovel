@@ -44,7 +44,7 @@
 					"text": "Again, why are you here?"
 				}
 			],
-			"options": "main"
+			"option_pool": "main"
 		},
 		"whoyou": {
 			"actions": [
@@ -65,7 +65,7 @@
 					"name": "Del"
 				}
 			],
-			"options": "main"
+			"option_pool": "main"
 		},
 		"whoi": {
 			"actions": [
@@ -94,7 +94,7 @@
 					}
 				}
 			],
-			"options": "main"
+			"option_pool": "main"
 		},
 		"whyhere": {
 			"actions": [
@@ -104,7 +104,7 @@
 					"text": "That's what I asked you... You've just appeared out of nowhere."
 				}
 			],
-			"options": "main"
+			"option_pool": "main"
 		},
 		"outsidescreen": {
 			"actions": [
@@ -146,7 +146,7 @@
 					}
 				}
 			],
-			"options": "main"
+			"option_pool": "main"
 		}
 	}
 }
